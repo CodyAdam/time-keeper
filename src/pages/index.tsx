@@ -1,10 +1,13 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import Image from 'next/image';
 import styles from '../styles/Home.module.css';
-import { collection, addDoc, getDocs, doc, getDoc, onSnapshot, runTransaction } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, runTransaction } from 'firebase/firestore';
 import { db } from './api/firebase';
 import { useEffect, useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
+import { ButtonGroup } from 'react-bootstrap';
 
 const dataRef = doc(db, 'nikki', 'data');
 
@@ -27,6 +30,7 @@ async function addCredits(amount: number) {
 
 const Home: NextPage = () => {
   const [credits, setCredits] = useState(0);
+  const [show, setShow] = useState(false);
   useEffect(() => {
     const unsub = onSnapshot(dataRef, (doc) => {
       setCredits(doc.data()?.credits);
@@ -50,26 +54,77 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
+        <h2>show : {show ? 'Yes' : 'No'}</h2>
         <h1 className={styles.title}>Credits : {credits}</h1>
-        <div>
-          <button
-            className={styles.card}
+        <ButtonGroup>
+          <Button
             onClick={() => {
               addCredits(-10);
             }}
           >
             -
-          </button>
-          <button
-            className={styles.card}
+          </Button>
+          <Button
             onClick={() => {
               addCredits(10);
             }}
           >
             +
-          </button>
-        </div>
+          </Button>
+          <Button
+            onClick={() => {
+              setShow(true);
+            }}
+          >
+            Add credits
+          </Button>
+          <div id='calendar' style={{ width: '800px' }}></div>
+        </ButtonGroup>
       </main>
+      <Modal
+        show={show}
+        onHide={() => {
+          setShow(false);
+        }}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Ajouter des crédits</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className='mb-3'>
+              <Form.Label>Montant</Form.Label>
+              <Form.Control type='htmlSize' />
+            </Form.Group>
+
+            <Form.Group className='mb-3'>
+              <Form.Label>Password</Form.Label>
+              <Form.Control type='password' placeholder='Password' />
+            </Form.Group>
+            <Form.Group className='mb-3'>
+              <Form.Check type='checkbox' label='Check me out' />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant='secondary'
+            onClick={() => {
+              setShow(false);
+            }}
+          >
+            Annuler
+          </Button>
+          <Button
+            variant='primary'
+            onClick={() => {
+              setShow(false);
+            }}
+          >
+            Ajouter
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
