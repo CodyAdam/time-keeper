@@ -1,50 +1,8 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-import { doc, getDoc, onSnapshot, runTransaction } from 'firebase/firestore';
-import { db } from './api/firebase';
-import { useEffect, useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
-import { ButtonGroup } from 'react-bootstrap';
-
-const dataRef = doc(db, 'nikki', 'data');
-
-async function addCredits(amount: number) {
-  try {
-    await runTransaction(db, async (transaction) => {
-      const sfDoc = await transaction.get(dataRef);
-      if (!sfDoc.exists()) {
-        throw 'Document does not exist!';
-      }
-
-      const newCredits = sfDoc.data().credits + amount;
-      transaction.update(dataRef, { credits: newCredits });
-    });
-    console.log('Transaction successfully committed!');
-  } catch (e) {
-    console.log('Transaction failed: ', e);
-  }
-}
 
 const Home: NextPage = () => {
-  const [credits, setCredits] = useState(0);
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    const unsub = onSnapshot(dataRef, (doc) => {
-      setCredits(doc.data()?.credits);
-    });
-    async function getCredits() {
-      const dataSnap = await getDoc(dataRef);
-      if (dataSnap.exists()) return dataSnap.data().credits;
-      else return 0;
-    }
-    getCredits().then((cred) => {
-      setCredits(cred);
-    });
-  }, []);
-
   return (
     <div className={styles.container}>
       <Head>
@@ -53,78 +11,7 @@ const Home: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <main className={styles.main}>
-        <h2>show : {show ? 'Yes' : 'No'}</h2>
-        <h1 className={styles.title}>Credits : {credits}</h1>
-        <ButtonGroup>
-          <Button
-            onClick={() => {
-              addCredits(-10);
-            }}
-          >
-            -
-          </Button>
-          <Button
-            onClick={() => {
-              addCredits(10);
-            }}
-          >
-            +
-          </Button>
-          <Button
-            onClick={() => {
-              setShow(true);
-            }}
-          >
-            Add credits
-          </Button>
-          <div id='calendar' style={{ width: '800px' }}></div>
-        </ButtonGroup>
-      </main>
-      <Modal
-        show={show}
-        onHide={() => {
-          setShow(false);
-        }}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Ajouter des crédits</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className='mb-3'>
-              <Form.Label>Montant</Form.Label>
-              <Form.Control type='htmlSize' />
-            </Form.Group>
-
-            <Form.Group className='mb-3'>
-              <Form.Label>Password</Form.Label>
-              <Form.Control type='password' placeholder='Password' />
-            </Form.Group>
-            <Form.Group className='mb-3'>
-              <Form.Check type='checkbox' label='Check me out' />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant='secondary'
-            onClick={() => {
-              setShow(false);
-            }}
-          >
-            Annuler
-          </Button>
-          <Button
-            variant='primary'
-            onClick={() => {
-              setShow(false);
-            }}
-          >
-            Ajouter
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <main className={styles.main}>Index</main>
     </div>
   );
 };
