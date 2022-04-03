@@ -4,19 +4,39 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { useState } from 'react';
 import { Button, ButtonGroup } from 'react-bootstrap';
+import { NextPage } from 'next';
+import { addCredits } from './Counter';
+import { DocumentData, DocumentReference } from 'firebase/firestore';
 
-export function AddCredits() {
+export const AddCredits: NextPage<{ userRef: DocumentReference<DocumentData> }> = ({ userRef }) => {
   const [show, setShow] = useState(false);
 
   return (
     <div className={styles.container}>
-      <Button
-        onClick={() => {
-          setShow(true);
-        }}
-      >
-        Add credits
-      </Button>
+      <ButtonGroup>
+        <Button
+          onClick={() => {
+            addCredits(-10, userRef);
+          }}
+        >
+          -
+        </Button>
+        <Button
+          onClick={() => {
+            addCredits(10, userRef);
+          }}
+        >
+          +
+        </Button>
+
+        <Button
+          onClick={() => {
+            setShow(true);
+          }}
+        >
+          Add credits
+        </Button>
+      </ButtonGroup>
       <Modal
         show={show}
         onHide={() => {
@@ -63,4 +83,4 @@ export function AddCredits() {
       </Modal>
     </div>
   );
-}
+};

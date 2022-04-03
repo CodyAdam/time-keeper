@@ -1,63 +1,43 @@
-import { onSnapshot, getDoc, runTransaction, doc } from 'firebase/firestore';
+import { onSnapshot, runTransaction, DocumentReference, DocumentData } from 'firebase/firestore';
+import { NextPage } from 'next';
 import { useEffect, useState } from 'react';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { db } from '../pages/api/firebase';
 import styles from '../styles/Counter.module.css';
 
-const dataRef = doc(db, 'nikki', 'data');
-
-async function addCredits(amount: number) {
+export async function addCredits(amount: number, userRef: DocumentReference<DocumentData>) {
   try {
     await runTransaction(db, async (transaction) => {
-      const sfDoc = await transaction.get(dataRef);
-      if (!sfDoc.exists()) {
+      const docSnap = await transaction.get(userRef);
+      if (!docSnap.exists()) {
         throw 'Document does not exist!';
       }
-
-      const newCredits = sfDoc.data().credits + amount;
-      transaction.update(dataRef, { credits: newCredits });
+      const credits = docSnap.data().credits;
+      const newCredits = (credits ? credits : 0) + amount;
+      transaction.update(userRef, { credits: newCredits });
     });
-    console.log('Transaction successfully committed!');
   } catch (e) {
-    console.log('Transaction failed: ', e);
+    console.error('Transaction failed: ', e);
   }
 }
 
-export function Counter() {
+export const Counter: NextPage<{ userRef: DocumentReference<DocumentData> }> = ({ userRef }) => {
   const [credits, setCredits] = useState(0);
 
   useEffect(() => {
-    const unsub = onSnapshot(dataRef, (doc) => {
-      setCredits(doc.data()?.credits);
+    addCredits(0, userRef);
+    const unsub = onSnapshot(userRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setCredits(docSnap.data().credits);
+      } else console.error('Doc not found :', userRef);
     });
-    async function getCredits() {
-      const dataSnap = await getDoc(dataRef);
-      if (dataSnap.exists()) return dataSnap.data().credits;
-      else return 0;
-    }
-    getCredits().then((cred) => {
-      setCredits(cred);
-    });
+    return () => {
+      unsub();
+    };
   }, []);
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Credits : {credits}</h1>
-      <ButtonGroup>
-        <Button
-          onClick={() => {
-            addCredits(-10);
-          }}
-        >
-          -
-        </Button>
-        <Button
-          onClick={() => {
-            addCredits(10);
-          }}
-        >
-          +
-        </Button>
-      </ButtonGroup>
     </div>
   );
-}
+};

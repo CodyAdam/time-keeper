@@ -1,3 +1,5 @@
-.container {
-  background-color: cadetblue;
+.submitContainer{
+  display: flex;
+  flex-direction: column;
+  gap:.2rem;
 }

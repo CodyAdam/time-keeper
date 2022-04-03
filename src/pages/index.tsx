@@ -4,30 +4,30 @@ import { Button, ButtonGroup } from 'react-bootstrap';
 import { AddUser } from '../modules/AddUser';
 import styles from '../styles/Home.module.css';
 import { db } from './api/firebase';
-import { doc, collection, query, getDocs } from 'firebase/firestore';
-import { useState } from 'react';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-
-async function getUsers() {
-  const q = query(collection(db, 'users'));
-  const querySnapshot = await getDocs(q);
-
-  const users: { id: string; data: any }[] = [];
-  querySnapshot.forEach((doc) => {
-    // doc.data() is never undefined for query doc snapshots
-    users.push({ id: doc.id, data: doc.data() });
-  });
-  return users;
-}
+import { User } from '../common/db';
 
 const Home: NextPage = () => {
   const router = useRouter();
-  const [users, setUsers] = useState<{ id: string; data: any }[]>([]);
-  getUsers().then((u) => {
-    setUsers(u);
-  });
+  const [users, setUsers] = useState<User[]>([]);
+  useEffect(() => {
+    const coll = collection(db, 'users');
+    const unsub = onSnapshot(coll, (querySnapshot) => {
+      const users: { id: string; data: any }[] = [];
+      querySnapshot.forEach((doc) => {
+        users.push({ id: doc.id, data: doc.data() });
+      });
+      setUsers(users);
+    });
+    return () => {
+      unsub();
+    };
+  }, []);
+
   const usersList = users.map(({ id, data }) => (
-    <Button key={id} onClick={() => router.push('/' + id)}>
+    <Button key={id} onClick={() => router.push({ pathname: '/[pid]', query: { pid: id } })}>
       {data.name}
     </Button>
   ));

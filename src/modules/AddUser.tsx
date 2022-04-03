@@ -1,9 +1,11 @@
 import styles from '../styles/Modal.module.css';
 import { Button, Form } from 'react-bootstrap';
 import { sha256 } from 'js-sha256';
-import { doc, addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../pages/api/firebase';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+const defaultUser = {};
 
 export function AddUser() {
   const [loading, setLoading] = useState<null | string>(null);
@@ -13,19 +15,17 @@ export function AddUser() {
     const target: { name: undefined | { value: string }; pass: undefined | { value: string } } = event.target as any;
     try {
       if (!target.name || !target.pass) throw 'Name or Pass not defined';
-      console.log(target.name.value);
-      console.log(target.pass.value);
-      console.log(sha256(target.pass.value));
       setLoading('Enregistrement en cours...');
       await addDoc(collection(db, 'users'), {
+        ...defaultUser,
         name: target.name.value,
         pass: sha256(target.pass.value),
       }).then(() => {
         setLoading(null);
-        location.reload();
       });
     } catch (e) {
-      console.log('Error during register ', e);
+      setLoading("Une erreur c'est produite");
+      console.log('Error during registration : ', e);
     }
   }
 
@@ -38,12 +38,14 @@ export function AddUser() {
         </Form.Group>
 
         <Form.Group className='mb-3'>
-          <Form.Label>Mot de passe</Form.Label>
           <Form.Control type='password' placeholder='Mot de passe' id='pass' required />
         </Form.Group>
-        <Form.Group className='mb-3'></Form.Group>
-        <Button type='submit'>Créer</Button>
-        {loading}
+        <div className={styles.submitContainer}>
+          <Button type='submit' disabled={loading != null}>
+            Créer
+          </Button>
+          <Form.Label>{loading}</Form.Label>
+        </div>
       </Form>
     </div>
   );
