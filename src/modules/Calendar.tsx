@@ -18,7 +18,7 @@ export const Calendar: NextPage = () => {
 
   return (
     <div className={styles.calendar}>
-      <CalendarTUI height='100%' view='week' template={template} />;
+      <CalendarTUI style={{ width: '100%' }} height='0px' view='week' template={template} />;
     </div>
   );
 };

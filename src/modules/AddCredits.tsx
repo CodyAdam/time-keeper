@@ -10,7 +10,11 @@ import { DocumentData, DocumentReference } from 'firebase/firestore';
 
 export const AddCredits: NextPage<{ userRef: DocumentReference<DocumentData> }> = ({ userRef }) => {
   const [show, setShow] = useState(false);
-
+  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    console.log('submited');
+    setShow(false);
+  }
   return (
     <div className={styles.container}>
       <ButtonGroup>
@@ -43,43 +47,33 @@ export const AddCredits: NextPage<{ userRef: DocumentReference<DocumentData> }> 
           setShow(false);
         }}
       >
-        <Modal.Header closeButton>
-          <Modal.Title>Ajouter des crédits</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
+        <Form onSubmit={onSubmit}>
+          <Modal.Header closeButton>
+            <Modal.Title>Ajouter des crédits</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
             <Form.Group className='mb-3'>
               <Form.Label>Montant</Form.Label>
-              <Form.Control type='htmlSize' />
+              <Form.Control type='htmlSize' required />
             </Form.Group>
 
             <Form.Group className='mb-3'>
               <Form.Label>Password</Form.Label>
-              <Form.Control type='password' placeholder='Password' />
+              <Form.Control type='password' placeholder='Password' required />
             </Form.Group>
-            <Form.Group className='mb-3'>
-              <Form.Check type='checkbox' label='Check me out' />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant='secondary'
-            onClick={() => {
-              setShow(false);
-            }}
-          >
-            Annuler
-          </Button>
-          <Button
-            variant='primary'
-            onClick={() => {
-              setShow(false);
-            }}
-          >
-            Ajouter
-          </Button>
-        </Modal.Footer>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant='secondary'
+              onClick={() => {
+                setShow(false);
+              }}
+            >
+              Annuler
+            </Button>
+            <Button type='submit'>Ajouter</Button>
+          </Modal.Footer>
+        </Form>
       </Modal>
     </div>
   );
