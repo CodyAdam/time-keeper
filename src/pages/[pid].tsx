@@ -5,19 +5,12 @@ import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
+const Calendar = dynamic(() => import('@toast-ui/react-calendar'), { ssr: false });
+
 export default function User() {
   const router = useRouter();
   const { pid } = router.query;
-  const [cal, setCal] = useState<JSX.Element | null>(null);
-  useEffect(() => {
-    if (!cal)
-      import('../modules/Calendar').then((mod) => {
-        console.log('Loaded');
-        console.log(mod.Calendar);
 
-        setCal(mod.Calendar);
-      });
-  }, [cal]);
   return (
     <div className={styles.container}>
       <Head>
@@ -26,9 +19,9 @@ export default function User() {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <div>Page : {pid}</div>
-      <div>calendar : {typeof cal}</div>
+      <div>calendar : {typeof Calendar}</div>
       <Counter />
-      {cal ? <cal /> : null}
+      <Calendar height='900px' view='day' />
     </div>
   );
 }

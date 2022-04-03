@@ -1,11 +1,11 @@
-import styles from '../styles/AddModule.module.css';
+import styles from '../styles/Modal.module.css';
 
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { useState } from 'react';
 import { Button, ButtonGroup } from 'react-bootstrap';
 
-export function AddModule() {
+export function AddCredits() {
   const [show, setShow] = useState(false);
 
   return (
