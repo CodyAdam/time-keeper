@@ -1,11 +1,14 @@
 import styles from '../styles/Calendar.module.css';
 import { useRef } from 'react';
 import React from 'react';
-import CalendarTUI from '@toast-ui/react-calendar';
+import { NextPage } from 'next';
+import dynamic from 'next/dynamic';
 
 import 'tui-calendar/dist/tui-calendar.css';
 
-export function Calendar() {
+const CalendarTUI = dynamic(() => import('@toast-ui/react-calendar'), { ssr: false });
+
+export const Calendar: NextPage = () => {
   let calendarRef = useRef(null);
   const template = {
     monthDayname: function (dayname: any) {
@@ -14,9 +17,8 @@ export function Calendar() {
   };
 
   return (
-    <div className={styles.container}>
-      <div>cal</div>
-      <CalendarTUI ref={calendarRef} height='1000px' view='week' template={template} />
+    <div className={styles.calendar}>
+      <CalendarTUI height='100%' view='week' template={template} />;
     </div>
   );
-}
+};
