@@ -14,3 +14,8 @@ a {
 * {
   box-sizing: border-box;
 }
+
+
+.tui-calendar-react-root{
+  width: 100%;
+}
