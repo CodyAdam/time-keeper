@@ -1,24 +1,15 @@
-import styles from '../styles/Calendar.module.css';
-import { useRef } from 'react';
-import React from 'react';
+import styles from '../styles/Default.module.css';
 import { NextPage } from 'next';
-import dynamic from 'next/dynamic';
-
-import 'tui-calendar/dist/tui-calendar.css';
-
-const CalendarTUI = dynamic(() => import('@toast-ui/react-calendar'), { ssr: false });
+import moment from 'moment';
+import { Calendar as Cal, momentLocalizer } from 'react-big-calendar';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 export const Calendar: NextPage = () => {
-  let calendarRef = useRef(null);
-  const template = {
-    monthDayname: function (dayname: any) {
-      return '<span class="calendar-week-dayname-name">' + dayname.label + '</span>';
-    },
-  };
+  const localizer = momentLocalizer(moment); // or globalizeLocalizer
 
   return (
-    <div className={styles.calendar}>
-      <CalendarTUI style={{ width: '100%' }} height='0px' view='week' template={template} />;
+    <div className={styles.container}>
+      <Cal localizer={localizer} startAccessor='start' endAccessor='end' />
     </div>
   );
 };
