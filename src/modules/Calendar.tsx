@@ -31,12 +31,6 @@ export const Calendar: NextPage<{ events: Event[] }> = ({ events }) => {
   const localizer = momentLocalizer(moment); // or globalizeLocalizer
   const views = useMemo(() => ({ week: true, day: true }), []);
 
-  useEffect(() => {
-    console.log('events', events);
-
-    return () => {};
-  }, [events]);
-
   return (
     <div className={styles.container}>
       <BigCalendar
