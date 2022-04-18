@@ -28,11 +28,6 @@ export type UserData = {
 };
 
 export default function User() {
-  const router = useRouter();
-  const pid = router.query.pid as string;
-  if (!pid) return <main className={styles.main}>Loading</main>;
-
-  const userRef = doc(db, 'users', pid);
   const [events, setEvents] = useState<Event[]>([]);
   const [data, setData] = useState<UserData>({
     name: '',
@@ -40,6 +35,10 @@ export default function User() {
     startTimestamp: null,
     pass: '',
   });
+  const router = useRouter();
+  const pid = router.query.pid as string;
+  if (!pid) return <main className={styles.main}>Loading</main>;
+  const userRef = doc(db, 'users', pid);
 
   let ongoingEvent: null | Event = null;
   if (data.startTimestamp) {
@@ -77,7 +76,7 @@ export default function User() {
       unsubData();
       unsubEvents();
     };
-  }, []);
+  }, [pid, userRef]);
   return (
     <div className={styles.container}>
       <Head>
