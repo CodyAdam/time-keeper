@@ -37,8 +37,6 @@ export default function User() {
   });
   const router = useRouter();
   const pid = router.query.pid as string;
-  if (!pid) return <main className={styles.main}>Loading</main>;
-  const userRef = doc(db, 'users', pid);
 
   let ongoingEvent: null | Event = null;
   if (data.startTimestamp) {
@@ -55,6 +53,8 @@ export default function User() {
   }
 
   useEffect(() => {
+    if (!pid) return;
+    const userRef = doc(db, 'users', pid);
     const unsubData = onSnapshot(userRef, (docSnap) => {
       if (docSnap.exists()) {
         const data: UserData = docSnap.data() as UserData;
@@ -76,7 +76,10 @@ export default function User() {
       unsubData();
       unsubEvents();
     };
-  }, [pid, userRef]);
+  }, [pid]);
+
+  if (!pid) return <main className={styles.main}>Loading</main>;
+  const userRef = doc(db, 'users', pid);
   return (
     <div className={styles.container}>
       <Head>
