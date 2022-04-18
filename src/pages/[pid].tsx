@@ -35,22 +35,26 @@ export default function User() {
     startTimestamp: null,
     pass: '',
   });
+  const [ongoingEvent, setOngoingEvent] = useState<Event | null>(null);
   const router = useRouter();
   const pid = router.query.pid as string;
 
-  let ongoingEvent: null | Event = null;
-  if (data.startTimestamp) {
-    const start = data.startTimestamp.toDate();
-    const end = moment().toDate();
-    ongoingEvent = {
-      title: getEventName(start, end),
-      start: start,
-      end: end,
-      hexColor: 'ff3333',
-      multiplier: 1,
-      cost: 0,
-    };
+  function updateOngoing() {
+    if (data.startTimestamp) {
+      const start = data.startTimestamp.toDate();
+      const end = moment().toDate();
+      setOngoingEvent({
+        title: getEventName(start, end),
+        start: start,
+        end: end,
+        hexColor: 'ff3333',
+        multiplier: 1,
+        cost: 0,
+      });
+    }
+    setTimeout(updateOngoing, 60000);
   }
+  useEffect(updateOngoing, [data.startTimestamp]);
 
   useEffect(() => {
     if (!pid) return;
@@ -72,6 +76,7 @@ export default function User() {
       });
       setEvents(tempEvents);
     });
+    updateOngoing();
     return () => {
       unsubData();
       unsubEvents();
@@ -121,7 +126,7 @@ function onStart(userRef: DocumentReference<DocumentData>) {
 function onEnd(userRef: DocumentReference<DocumentData>, startTimestamp: Timestamp | null = null) {
   let start: null | Date = null;
   if (startTimestamp) start = startTimestamp.toDate();
-  else return console.log("Can't find start time");
+  else return console.error("Can't find start time");
   updateDoc(userRef, {
     startTimestamp: null,
   })

@@ -20,7 +20,6 @@ function eventStyleGetter(event: Event, start: Date, end: Date, isSelected: bool
     backgroundColor: backgroundColor,
     opacity: 0.9,
     color: 'white',
-    border: '0px',
   };
   return {
     style: style,
