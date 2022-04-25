@@ -1,11 +1,21 @@
-.container {
-  height: 100vh;
-  width: 100vw;
+.vContainer {
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 5px;
+}
+
+.hContainer {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  align-items: stretch;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  justify-items: stretch;
 }
 
 .calendar {

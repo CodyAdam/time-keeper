@@ -11,19 +11,22 @@ import { sha256 } from 'js-sha256';
 
 export const Admin: NextPage<{ userRef: DocumentReference<DocumentData>; data: UserData }> = ({ userRef, data }) => {
   const [show, setShow] = useState(false);
-  const [credits, setCredits] = useState<number>(0);
+  const [credits, setCredits] = useState<number | undefined>(0);
   const [pass, setPass] = useState('');
+  const [infoMsg, setInfoMsg] = useState('');
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (sha256(pass) === data.pass) {
-      addCredits(credits, userRef);
-      setCredits(0);
-      setPass('');
-      setShow(false);
-    } else {
-      alert('Mauvais mot de passe');
-    }
+    addCredits(credits != undefined ? credits : 0, userRef, sha256(pass))
+      .then(() => {
+        setCredits(0);
+        setPass('');
+        setShow(false);
+      })
+      .catch((error) => {
+        setPass('');
+        setInfoMsg('Une erreur est survenue : ' + error);
+      });
   }
   return (
     <div className={styles.container}>
@@ -55,11 +58,14 @@ export const Admin: NextPage<{ userRef: DocumentReference<DocumentData>; data: U
             </Form.Group>
             <Form.Group className='mb-3'>
               <Form.Label>
-                Ajout de crédits{credits != 0 ? ` (Nouveau solde : ${Math.max(credits + data.credits, 0)})` : ''}
+                Ajout de crédits
+                {credits != undefined && credits != 0
+                  ? ` (Nouveau solde : ${Math.max(credits + data.credits, 0)})`
+                  : ''}
               </Form.Label>
               <Form.Control
                 onChange={(e) => {
-                  setCredits(e.target.value ? parseInt(e.target.value) : 0);
+                  setCredits(e.target.value ? parseInt(e.target.value) : undefined);
                 }}
                 value={credits}
                 name='credits amount'
@@ -70,13 +76,21 @@ export const Admin: NextPage<{ userRef: DocumentReference<DocumentData>; data: U
             <Form.Group className='mb-3'>
               <Form.Label>Mot de passe</Form.Label>
               <Form.Control
-                onChange={(e) => setPass(e.target.value)}
+                onChange={(e) => {
+                  setPass(e.target.value);
+                  setInfoMsg('');
+                }}
                 value={pass}
                 type='password'
                 placeholder='Mot de passe'
                 required
               />
             </Form.Group>
+            {infoMsg ? (
+              <small>
+                <Form.Label className={styles.error}>{infoMsg}</Form.Label>
+              </small>
+            ) : null}
           </Modal.Body>
           <Modal.Footer>
             <Button
