@@ -52,8 +52,9 @@ export default function User() {
         multiplier: 1,
         cost: 0,
       });
+    }else {
+      setOngoingEvent(null);
     }
-    setTimeout(updateOngoing, 30000);
   }
   useEffect(updateOngoing, [data.startTimestamp]);
 
@@ -96,22 +97,21 @@ export default function User() {
       </Head>
       <EventHistory events={events} />
       <div className={styles.vContainer}>
-        <Counter credits={data.credits} />
         <Admin userRef={userRef} data={data} />
+        <Counter credits={data.credits} />
         <ButtonGroup>
           <Button
+            variant="outline-primary"
             onClick={() => {
-              onStart(userRef);
+              onToggle(userRef, data.startTimestamp);
             }}
           >
-            Start
+            {data.startTimestamp ? 'End' : 'Start'}
           </Button>
-          <Button
-            onClick={() => {
-              onEnd(userRef, data.startTimestamp);
-            }}
-          >
-            Stop
+          <Button 
+            onClick={() => {updateOngoing();}}
+            >
+            Refresh
           </Button>
         </ButtonGroup>
         <Calendar events={ongoingEvent ? events.concat([ongoingEvent]) : events} />
@@ -119,6 +119,14 @@ export default function User() {
       <div className={styles.center}>NOTHING YET</div>
     </div>
   );
+}
+
+function onToggle(userRef: DocumentReference<DocumentData>, startTimestamp: Timestamp | null = null){
+  if (startTimestamp) {
+    onEnd(userRef, startTimestamp);
+  } else {
+    onStart(userRef);
+  }
 }
 
 function onStart(userRef: DocumentReference<DocumentData>) {
