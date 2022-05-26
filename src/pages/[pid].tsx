@@ -177,8 +177,13 @@ function AppendEvent(userRef: DocumentReference<DocumentData>, event: Event) {
 function getEventName(start: Date, end: Date, credits: number = 0) {
   const duration = moment.duration(moment(end).diff(moment(start)));
   const credSpent = ' (' + credits.toString() + ' credits)';
-  const unit = duration.asHours() > 1 ? 'h' : 'min';
-  return duration.asMinutes().toPrecision(3).toString() + ' ' + unit + ' ' + credSpent;
+  if (duration.asMinutes() < 1)
+    return "<1 min" + credSpent;
+  else if (duration.asHours() < 1) {
+    return `${duration.asMinutes().toFixed()} min ${credSpent}`;
+  }else {
+    return `${moment.utc(duration.asMilliseconds()).format("HH:mm")} ${credSpent}`;
+  }
 }
 
 
