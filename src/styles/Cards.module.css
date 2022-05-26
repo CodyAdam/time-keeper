@@ -21,3 +21,9 @@
 .vScroll {
   overflow-y: auto;
 }
+
+.leftright{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
