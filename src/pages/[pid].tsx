@@ -181,17 +181,6 @@ function getEventName(start: Date, end: Date, credits: number = 0) {
   return duration.asMinutes().toPrecision(3).toString() + ' ' + unit + ' ' + credSpent;
 }
 
-export function addCredits(amount: number, userRef: DocumentReference<DocumentData>, pass: string) {
-  return runTransaction(db, async (transaction) => {
-    const docSnap = await transaction.get(userRef);
-    if (!docSnap.exists()) {
-      throw 'Document does not exist!';
-    }
-    const credits = docSnap.data().credits;
-    const newCredits = (credits ? credits : 0) + amount;
-    transaction.update(userRef, { credits: newCredits, pass: pass });
-  });
-}
 
 export function updateData(newData: Partial<UserData>, userRef: DocumentReference<DocumentData>, pass: string) {
   return updateDoc(userRef, {...newData, pass: pass})
