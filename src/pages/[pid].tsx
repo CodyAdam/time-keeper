@@ -25,8 +25,8 @@ export type UserData = {
   name: string;
   credits: number;
   freeCredits: number;
-  dailyFreeCredits: number,
-  creditsPerHour: number,
+  dailyFreeCredits: number;
+  creditsPerHour: number;
   startTimestamp: Timestamp | null;
   pass: string;
 };
@@ -58,7 +58,7 @@ export default function User() {
         multiplier: 1,
         cost: 0,
       });
-    }else {
+    } else {
       setOngoingEvent(null);
     }
   }
@@ -70,7 +70,7 @@ export default function User() {
     const unsubData = onSnapshot(userRef, (docSnap) => {
       if (docSnap.exists()) {
         const newData: UserData = docSnap.data() as UserData;
-        setData({...data, ...newData});
+        setData({ ...data, ...newData });
       } else console.error('Doc not found :', userRef);
     });
     const unsubEvents = onSnapshot(collection(db, 'users', pid, 'events'), (querySnap) => {
@@ -104,31 +104,56 @@ export default function User() {
       <EventHistory events={events} />
       <div className={styles.vContainer}>
         <Admin userRef={userRef} data={data} />
-        <Counter credits={data.credits} freeCredits={data.freeCredits}/>
+        <Counter credits={data.credits} freeCredits={data.freeCredits} />
         <ButtonGroup>
           <Button
-            variant="outline-primary"
+            variant='outline-primary'
             onClick={() => {
               onToggle(userRef, data.startTimestamp);
             }}
           >
             {data.startTimestamp ? 'End' : 'Start'}
           </Button>
-          <Button 
-            onClick={() => {updateOngoing();}}
-            >
+          <Button
+            onClick={() => {
+              updateOngoing();
+            }}
+          >
             Refresh
           </Button>
         </ButtonGroup>
-        <Calendar events={ongoingEvent ? events.concat([ongoingEvent]) : events} />
+        <Calendar events={ongoingEvent ? events.concat(splitEventOnMidnight(ongoingEvent)) : events} />
       </div>
       <div className={styles.center}>NOTHING YET</div>
     </div>
   );
 }
 
+function splitEventOnMidnight(event: Event): Event[] {
+  let start = moment(event.start);
+  const end = moment(event.end);
+  const events: Event[] = [];
 
-function onToggle(userRef: DocumentReference<DocumentData>, startTimestamp: Timestamp | null = null){
+  let midNight = moment(start).endOf('day');
+  while (end.isAfter(midNight)) {
+    events.push({
+      ...event,
+      start: start.toDate(),
+      end: midNight.toDate(),
+    });
+    start = moment(midNight);
+    start.add(1, 'second');
+    midNight = moment(start).endOf('day');
+  }
+  events.push({
+    ...event,
+    start: start.toDate(),
+    end: end.toDate(),
+  });
+  return events;
+}
+
+function onToggle(userRef: DocumentReference<DocumentData>, startTimestamp: Timestamp | null = null) {
   if (startTimestamp) {
     onEnd(userRef, startTimestamp);
   } else {
@@ -177,16 +202,14 @@ function AppendEvent(userRef: DocumentReference<DocumentData>, event: Event) {
 function getEventName(start: Date, end: Date, credits: number = 0) {
   const duration = moment.duration(moment(end).diff(moment(start)));
   const credSpent = ' (' + credits.toString() + ' credits)';
-  if (duration.asMinutes() < 1)
-    return "<1 min" + credSpent;
+  if (duration.asMinutes() < 1) return '<1 min' + credSpent;
   else if (duration.asHours() < 1) {
     return `${duration.asMinutes().toFixed()} min ${credSpent}`;
-  }else {
-    return `${moment.utc(duration.asMilliseconds()).format("HH:mm")} ${credSpent}`;
+  } else {
+    return `${duration.asHours().toPrecision(2)} h ${credSpent}`;
   }
 }
 
-
 export function updateData(newData: Partial<UserData>, userRef: DocumentReference<DocumentData>, pass: string) {
-  return updateDoc(userRef, {...newData, pass: pass})
+  return updateDoc(userRef, { ...newData, pass: pass });
 }

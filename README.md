@@ -1,5 +1,4 @@
 # Todo : 
 
 - [ ] multiplier panel
-- [ ] dayly counter
-- [ ] 
+- [x] ongoing event spliter
