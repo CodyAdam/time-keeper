@@ -192,3 +192,7 @@ export function addCredits(amount: number, userRef: DocumentReference<DocumentDa
     transaction.update(userRef, { credits: newCredits, pass: pass });
   });
 }
+
+export function updateData(newData: Partial<UserData>, userRef: DocumentReference<DocumentData>, pass: string) {
+  return updateDoc(userRef, {...newData, pass: pass})
+}

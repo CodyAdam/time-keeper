@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form';
 import { useRef, useState } from 'react';
 import { Button, ButtonGroup } from 'react-bootstrap';
 import { NextPage } from 'next';
-import { addCredits, UserData } from '../pages/[pid]';
+import { updateData, UserData } from '../pages/[pid]';
 import { DocumentData, DocumentReference } from 'firebase/firestore';
 import { sha256 } from 'js-sha256';
 
@@ -15,12 +15,12 @@ export const Admin: NextPage<{ userRef: DocumentReference<DocumentData>; data: U
   const [creditsPerHour, setCreditsPerHour] = useState(data.creditsPerHour);
   const [dailyFreeCredits, setDailyFreeCredits] = useState(data.dailyFreeCredits);
   const [pass, setPass] = useState('');
-
   const [infoMsg, setInfoMsg] = useState('');
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    addCredits(credits != undefined ? credits : 0, userRef, sha256(pass))
+    const newData : Partial<UserData> = {credits: credits != undefined ? credits : 0, creditsPerHour: creditsPerHour, dailyFreeCredits: dailyFreeCredits};
+    updateData(newData, userRef, sha256(pass))
       .then(() => {
         setCredits(0);
         setPass('');
@@ -28,7 +28,7 @@ export const Admin: NextPage<{ userRef: DocumentReference<DocumentData>; data: U
       })
       .catch((error) => {
         setPass('');
-        setInfoMsg('Une erreur est survenue : ' + error);
+        setInfoMsg('Error updating doc : ' + error);
       });
   }
   return (
