@@ -6,7 +6,7 @@ import moment from 'moment';
 
 export const EventHistory: NextPage<{ events: Event[] }> = ({ events }) => {
   const cards = events.map((e: Event) => (
-    <Card style={{ margin: '1rem' }}>
+    <Card style={{ margin: '1rem' }} key={e.start.toISOString()}>
       <Card.Body>
         <Card.Title>{e.title}</Card.Title>
         <Card.Text>{e.start.toISOString()}</Card.Text>
