@@ -12,7 +12,7 @@ import { sha256 } from 'js-sha256';
 export const Admin: NextPage<{ userRef: DocumentReference<DocumentData>; data: UserData }> = ({ userRef, data }) => {
   const [show, setShow] = useState(false);
   const [credits, setCredits] = useState<number | undefined>(0);
-  const [creditsPerHour, setCreditsPerHour] = useState(data.creditsPerHour)
+  const [creditsPerHour, setCreditsPerHour] = useState(data.creditsPerHour);
   const [dailyFreeCredits, setDailyFreeCredits] = useState(data.dailyFreeCredits);
   const [pass, setPass] = useState('');
 
@@ -62,9 +62,7 @@ export const Admin: NextPage<{ userRef: DocumentReference<DocumentData>; data: U
             <Form.Group className='mb-3'>
               <Form.Label>
                 Add credits
-                {credits != undefined && credits != 0
-                  ? ` (Nouveau solde : ${credits + data.credits})`
-                  : ''}
+                {credits != undefined && credits != 0 ? ` (Nouveau solde : ${credits + data.credits})` : ''}
               </Form.Label>
               <Form.Control
                 onChange={(e) => {
@@ -76,15 +74,24 @@ export const Admin: NextPage<{ userRef: DocumentReference<DocumentData>; data: U
               />
             </Form.Group>
             <Form.Group className='mb-3'>
-              <Form.Label>
-                Daily free credits quantity
-              </Form.Label>
+              <Form.Label>Daily free credits quantity</Form.Label>
               <Form.Control
                 onChange={(e) => {
                   setDailyFreeCredits(e.target.value ? parseInt(e.target.value) : 0);
                 }}
                 value={dailyFreeCredits}
                 name='daily free credits'
+                type='number'
+              />
+            </Form.Group>
+            <Form.Group className='mb-3'>
+              <Form.Label>Credits per hour</Form.Label>
+              <Form.Control
+                onChange={(e) => {
+                  setCreditsPerHour(e.target.value ? parseInt(e.target.value) : 0);
+                }}
+                value={creditsPerHour}
+                name='credits per hour'
                 type='number'
               />
             </Form.Group>
