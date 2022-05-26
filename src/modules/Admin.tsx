@@ -12,7 +12,10 @@ import { sha256 } from 'js-sha256';
 export const Admin: NextPage<{ userRef: DocumentReference<DocumentData>; data: UserData }> = ({ userRef, data }) => {
   const [show, setShow] = useState(false);
   const [credits, setCredits] = useState<number | undefined>(0);
+  const [creditsPerHour, setCreditsPerHour] = useState(data.creditsPerHour)
+  const [dailyFreeCredits, setDailyFreeCredits] = useState(data.dailyFreeCredits);
   const [pass, setPass] = useState('');
+
   const [infoMsg, setInfoMsg] = useState('');
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -45,22 +48,22 @@ export const Admin: NextPage<{ userRef: DocumentReference<DocumentData>; data: U
       >
         <Form onSubmit={onSubmit}>
           <Modal.Header closeButton>
-            <Modal.Title>Pannel d'administration</Modal.Title>
+            <Modal.Title>Admin Panel</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form.Group className='mb-3'>
-              <Form.Label>Id d'utilisateur</Form.Label>
+              <Form.Label>User id</Form.Label>
               <Form.Control name='user id' value={userRef.id} type='text' readOnly />
             </Form.Group>
             <Form.Group className='mb-3'>
-              <Form.Label>Nom d'utilisateur</Form.Label>
+              <Form.Label>Username</Form.Label>
               <Form.Control name='username' value={data.name} type='text' readOnly />
             </Form.Group>
             <Form.Group className='mb-3'>
               <Form.Label>
-                Ajout de crédits
+                Add credits
                 {credits != undefined && credits != 0
-                  ? ` (Nouveau solde : ${Math.max(credits + data.credits, 0)})`
+                  ? ` (Nouveau solde : ${credits + data.credits})`
                   : ''}
               </Form.Label>
               <Form.Control
@@ -70,11 +73,23 @@ export const Admin: NextPage<{ userRef: DocumentReference<DocumentData>; data: U
                 value={credits}
                 name='credits amount'
                 type='number'
-                autoComplete='new-amount'
               />
             </Form.Group>
             <Form.Group className='mb-3'>
-              <Form.Label>Mot de passe</Form.Label>
+              <Form.Label>
+                Daily free credits quantity
+              </Form.Label>
+              <Form.Control
+                onChange={(e) => {
+                  setDailyFreeCredits(e.target.value ? parseInt(e.target.value) : 0);
+                }}
+                value={dailyFreeCredits}
+                name='daily free credits'
+                type='number'
+              />
+            </Form.Group>
+            <Form.Group className='mb-3'>
+              <Form.Label>Password</Form.Label>
               <Form.Control
                 onChange={(e) => {
                   setPass(e.target.value);
@@ -82,7 +97,7 @@ export const Admin: NextPage<{ userRef: DocumentReference<DocumentData>; data: U
                 }}
                 value={pass}
                 type='password'
-                placeholder='Mot de passe'
+                placeholder='Password'
                 required
               />
             </Form.Group>
@@ -99,9 +114,9 @@ export const Admin: NextPage<{ userRef: DocumentReference<DocumentData>; data: U
                 setShow(false);
               }}
             >
-              Annuler
+              Cancel
             </Button>
-            <Button type='submit'>Valider</Button>
+            <Button type='submit'>Submit</Button>
           </Modal.Footer>
         </Form>
       </Modal>
