@@ -38,7 +38,7 @@ export const Admin: NextPage<{ userRef: DocumentReference<DocumentData>; data: U
           setShow(true);
         }}
       >
-        Pannel d'administration
+        Admin Panel
       </Button>
       <Modal
         show={show}

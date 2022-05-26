@@ -20,7 +20,7 @@ export const EventHistory: NextPage<{ events: Event[] }> = ({ events }) => {
   return (
     <div className={styles.container}>
       <Card className={styles.main}>
-        <Card.Header>Historique{cards.length > 0 ? ` (${cards.length})` : ''}</Card.Header>
+        <Card.Header>History{cards.length > 0 ? ` (${cards.length})` : ''}</Card.Header>
         <Card.Body className={styles.vScroll}>{cards}</Card.Body>
       </Card>
     </div>
