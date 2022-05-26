@@ -5,17 +5,20 @@ import { Card } from 'react-bootstrap';
 import moment from 'moment';
 
 export const EventHistory: NextPage<{ events: Event[] }> = ({ events }) => {
-  const cards = events.map((e: Event) => (
-    <Card style={{ margin: '1rem' }} key={e.start.toISOString()}>
-      <Card.Body>
-        <Card.Title>{e.title}</Card.Title>
-        <Card.Text>{e.start.toISOString()}</Card.Text>
-        <Card.Text>
-          {e.start.toLocaleString()} - {e.end.toLocaleString()}
-        </Card.Text>
-      </Card.Body>
-    </Card>
-  ));
+  const cards = events.map((e: Event) => {
+    const date: string = moment(e.start).format('MMMM Do YYYY');
+    return (
+      <Card style={{ margin: '1rem' }} key={e.start.toISOString()}>
+        <Card.Body>
+          <Card.Title>{e.title}</Card.Title>
+          <div className={styles.leftright}>
+            {e.cost == 0? 'Free' : `${e.cost} credits`}
+            <div>{date}</div>
+          </div>
+        </Card.Body>
+      </Card>
+    );
+  });
 
   return (
     <div className={styles.container}>
