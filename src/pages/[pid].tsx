@@ -24,6 +24,9 @@ import { EventHistory } from '../modules/EventHistory';
 export type UserData = {
   name: string;
   credits: number;
+  freeCredits: number;
+  dailyFreeCredits: number,
+  creditsPerHour: number,
   startTimestamp: Timestamp | null;
   pass: string;
 };
@@ -33,6 +36,9 @@ export default function User() {
   const [data, setData] = useState<UserData>({
     name: '',
     credits: 0,
+    freeCredits: 400,
+    dailyFreeCredits: 400,
+    creditsPerHour: 200,
     startTimestamp: null,
     pass: '',
   });
@@ -63,8 +69,8 @@ export default function User() {
     const userRef = doc(db, 'users', pid);
     const unsubData = onSnapshot(userRef, (docSnap) => {
       if (docSnap.exists()) {
-        const data: UserData = docSnap.data() as UserData;
-        setData(data);
+        const newData: UserData = docSnap.data() as UserData;
+        setData({...data, ...newData});
       } else console.error('Doc not found :', userRef);
     });
     const unsubEvents = onSnapshot(collection(db, 'users', pid, 'events'), (querySnap) => {
@@ -98,7 +104,7 @@ export default function User() {
       <EventHistory events={events} />
       <div className={styles.vContainer}>
         <Admin userRef={userRef} data={data} />
-        <Counter credits={data.credits} />
+        <Counter credits={data.credits} freeCredits={data.freeCredits}/>
         <ButtonGroup>
           <Button
             variant="outline-primary"
@@ -120,6 +126,7 @@ export default function User() {
     </div>
   );
 }
+
 
 function onToggle(userRef: DocumentReference<DocumentData>, startTimestamp: Timestamp | null = null){
   if (startTimestamp) {
