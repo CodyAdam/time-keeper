@@ -12,6 +12,7 @@ import { User } from '../common/db';
 const Home: NextPage = () => {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
+  const [showNew, setShowNew] = useState(false);
   useEffect(() => {
     const coll = collection(db, 'users');
     const unsub = onSnapshot(coll, (querySnapshot) => {
@@ -35,20 +36,29 @@ const Home: NextPage = () => {
   return (
     <div className={styles.container}>
       <Head>
-        <title>The time trader</title>
+        <title>Time keeper</title>
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <main className={styles.main}>
-        <div className={styles.title}>The time trader</div>
+        <div className={styles.title}>Time keeper</div>
         <div className={styles.grid}>
           <div className={styles.card}>
-            <h2>Selectionnez un utilisateur existant</h2>
-            <div className={styles.buttonGroup}>{usersList.length ? usersList : 'Aucun existant'}</div>
+            <h2>Select the user</h2>
+            <div className={styles.buttonGroup}>
+              {usersList.length ? usersList : showNew ? "None yet": null}
+              {!showNew ? (
+                <Button variant='outline-primary' onClick={() => setShowNew(true)}>
+                  New
+                </Button>
+              ) : null}
+            </div>
           </div>
-          <div className={styles.card}>
-            <h2>Ou créer un nouvel utilisateur</h2>
-            <AddUser />
-          </div>
+          {showNew ? (
+            <div className={styles.card}>
+              <h2>Create a new user</h2>
+              <AddUser onAdd={()=>{setShowNew(false);}}/>
+            </div>
+          ) : null}
         </div>
       </main>
     </div>

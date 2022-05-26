@@ -7,24 +7,28 @@ import { useEffect, useState } from 'react';
 
 const defaultUser = {};
 
-export function AddUser() {
+export function AddUser({ onAdd }: { onAdd: () => void }) {
   const [loading, setLoading] = useState<null | string>(null);
+  const [errorMsg, setErrorMsg] = useState<null | string>(null);
 
   async function registerUser(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const target: { name: undefined | { value: string }; pass: undefined | { value: string } } = event.target as any;
     try {
       if (!target.name || !target.pass) throw 'Name or Pass not defined';
-      setLoading('Enregistrement en cours...');
+      setLoading('Registering...');
       await addDoc(collection(db, 'users'), {
         ...defaultUser,
         name: target.name.value,
         pass: sha256(target.pass.value),
       }).then(() => {
         setLoading(null);
+        setErrorMsg(null);
+        onAdd();
       });
     } catch (e) {
-      setLoading("Une erreur c'est produite");
+      setLoading(null);
+      setErrorMsg(`An error occured : ${e}`);
       console.log('Error during registration : ', e);
     }
   }
@@ -33,18 +37,20 @@ export function AddUser() {
     <div>
       <Form onSubmit={registerUser}>
         <Form.Group className='mb-3'>
-          <Form.Label>Nom</Form.Label>
+          <Form.Label>Name</Form.Label>
           <Form.Control type='htmlSize' id='name' required />
         </Form.Group>
 
         <Form.Group className='mb-3'>
-          <Form.Control type='password' placeholder='Mot de passe' id='pass' required />
+          <Form.Control type='password' placeholder='Password' id='pass' required />
         </Form.Group>
         <div className={styles.submitContainer}>
           <Button type='submit' disabled={loading != null}>
             Créer
           </Button>
           <Form.Label>{loading}</Form.Label>
+          <Form.Label className={styles.error}
+          >{errorMsg}</Form.Label>
         </div>
       </Form>
     </div>
