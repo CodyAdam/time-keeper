@@ -1,5 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import Image from 'next/image'
 import { Button, ButtonGroup } from 'react-bootstrap';
 import { AddUser } from '../modules/AddUser';
 import styles from '../styles/Home.module.css';
@@ -61,8 +62,15 @@ const Home: NextPage = () => {
           ) : null}
         </div>
       </main>
+      <footer className={styles.footer}>
+        <div>
+      <a href='https://github.com/CodyAdam' target={"_blank"}>
+        <Image src='/github.png' width={16} height={16} />
+      </a>
+      Made with ♥ by <a href="https://codyadm.com" target={"_blank"}>Cody</a>
+        </div>
+      </footer>
     </div>
   );
-};
-
+}
 export default Home;
