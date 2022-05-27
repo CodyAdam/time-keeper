@@ -10,7 +10,6 @@ import {
   DocumentData,
   DocumentReference,
   onSnapshot,
-  runTransaction,
   Timestamp,
   updateDoc,
 } from 'firebase/firestore';
@@ -78,6 +77,7 @@ export default function User() {
       querySnap.forEach((docSnap) => {
         tempEvents.push({
           ...(docSnap.data() as Event),
+          id: docSnap.id,
           start: docSnap.data().start.toDate(),
           end: docSnap.data().end.toDate(),
         });
@@ -122,14 +122,14 @@ export default function User() {
             Refresh
           </Button>
         </ButtonGroup>
-        <Calendar events={ongoingEvent ? events.concat(splitEventOnMidnight(ongoingEvent)) : events} />
+        <Calendar events={ongoingEvent ? events.concat([ongoingEvent]) : events} />
       </div>
       <div className={styles.center}>NOTHING YET</div>
     </div>
   );
 }
 
-function splitEventOnMidnight(event: Event): Event[] {
+export function splitEventOnMidnight(event: Event): Event[] {
   let start = moment(event.start);
   const end = moment(event.end);
   const events: Event[] = [];
@@ -172,31 +172,28 @@ function onStart(userRef: DocumentReference<DocumentData>) {
 function onEnd(userRef: DocumentReference<DocumentData>, startTimestamp: Timestamp | null = null) {
   let start: null | Date = null;
   if (startTimestamp) start = startTimestamp.toDate();
-  else return console.error("Can't find start time");
-  updateDoc(userRef, {
-    startTimestamp: null,
-  })
-    .then(() => {
-      if (start == null) throw "Can't find start time";
-      const end = moment().toDate();
-      AppendEvent(userRef, {
-        start: start,
-        end: end,
-        title: getEventName(start, end),
-        multiplier: 1,
-        cost: 0,
-      });
-    })
-    .catch((error) => {
+  else return console.error("Can't find startTimestamp");
+  const end = moment().toDate();
+  AppendEvent(userRef, {
+    start: start,
+    end: end,
+    title: getEventName(start, end),
+    multiplier: 1,
+    cost: 0,
+  }).then(()=>{
+    updateDoc(userRef, {
+      startTimestamp: null,
+    }).catch((error) => {
       console.error('Error updating doc :', error);
     });
+  }).catch((error) => {
+    console.error('Error adding event :', error);
+  });    
 }
 
 function AppendEvent(userRef: DocumentReference<DocumentData>, event: Event) {
   const eventsRef = collection(db, 'users', userRef.id, 'events');
-  addDoc(eventsRef, event).catch((error) => {
-    console.error('Error adding event :', error);
-  });
+  return addDoc(eventsRef, event);
 }
 
 function getEventName(start: Date, end: Date, credits: number = 0) {
